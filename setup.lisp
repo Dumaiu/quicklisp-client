@@ -2,7 +2,8 @@
   (:use #:cl)
   (:export #:*quicklisp-home*
            #:qmerge
-           #:qenough))
+           #:qenough
+		   #:load-without-compiling))
 
 (in-package #:ql-setup)
 
@@ -130,6 +131,10 @@ compiling asdf.lisp to a FASL and then loading it."
       (*compile-verbose* nil)
       (*load-verbose* nil)
       (*load-print* nil))
-  (asdf:oos 'asdf:load-op "quicklisp" :verbose nil))
+  (restart-case
+	  (asdf:oos 'asdf:load-op "quicklisp" :verbose nil)
+	(load-without-compiling ()
+	  :report "Load Quicklisp without compiling, using `asdf:load-source-op'"
+	  (asdf:oos 'asdf:load-source-op "quicklisp" :verbose nil))))
 
 (quicklisp:setup)
