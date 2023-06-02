@@ -128,13 +128,15 @@ compiling asdf.lisp to a FASL and then loading it."
 (push (qmerge "quicklisp/") asdf:*central-registry*)
 
 (let ((*compile-print* nil)
-      (*compile-verbose* nil)
-      (*load-verbose* nil)
-      (*load-print* nil))
-  (restart-case
-	  (asdf:oos 'asdf:load-op "quicklisp" :verbose nil)
-	(load-without-compiling ()
-	  :report "Load Quicklisp without compiling, using `asdf:load-source-op'"
-	  (asdf:oos 'asdf:load-source-op "quicklisp" :verbose nil))))
+	  (*compile-verbose* nil)
+	  (*load-verbose* nil)
+	  (*load-print* nil))
+  (flet ((asdf-load (op)
+		   (asdf:oos op "quicklisp" :verbose nil)))
+	(restart-case
+		(asdf-load 'asdf:load-op)
+	  (load-without-compiling ()
+		:report "Load Quicklisp without compiling, using `asdf:load-source-op'"
+		(asdf-load 'asdf:load-source-op)))))
 
 (quicklisp:setup)
